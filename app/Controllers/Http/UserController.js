@@ -43,10 +43,22 @@ class UserController {
 			ticket_number: 'required|min:10|max:10'
 		}
 
-		const validation = await validate(request.all(), rules)
+		const messages = {
+			'mail.required': "você precisa digitar um e-mail",
+			'mail.email': "formato de e-mail inválido",
+			'mail.unique': "está conta de e-mail já foi cadastrada no aplicativo!",
+			'password.required': "você precisa digitar uma senha",
+			'password.min': "sua senha deve ter no mínimo 5 caracteres",
+			'password.max': "sua senha deve ter no máximo 15 caracteres",
+			'ticket_number.required': "você precisa fornecer o número do ingresso do Sympla",
+			'ticket_number.min': "seu número de ingresso deve ter no mínimo 10 caracteres",
+			'ticket_number.max': "seu número de ingresso deve ter no máximo 10 caracteres",
+		}
+
+		const validation = await validate(request.all(), rules, messages)
 
 		if (validation.fails()) {
-			return validation.messages()
+			return response.status(400).send(validation.messages())
 		}
 
 		const { ticket_number, mail, password } = request.all();
