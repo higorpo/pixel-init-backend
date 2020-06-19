@@ -17,7 +17,7 @@ var { isAfter, isBefore } = require('date-fns');
  */
 class PixelthonController {
 	/**
-	 * Show a list of all pixelthon participants.
+	 * Mostra informações do Pixelthon
 	 * GET /pixelthon
 	 *
 	 * @param {object} ctx
@@ -25,11 +25,46 @@ class PixelthonController {
 	 * @param {Response} ctx.response
 	 * @param {View} ctx.view
 	 */
-	async index({ request, response, view }) {
+	async index({ request, response, auth }) {
+		const rules = {
+			date: 'required|string',
+		}
+
+		const messages = {
+			'date.required': "você precisa de um datetime",
+		}
+
+		const validation = await validate(request.headers(), rules, messages)
+
+		if (validation.fails()) {
+			return response.status(400).send(validation.messages())
+		}
+
+		const participants = await PixelthonParticipant.getCount();
+
+		const is_participant = await PixelthonParticipant
+			.query()
+			.where('user_id', auth.user.id)
+			.getCount()
+
+		let is_within_the_application_deadline = false;
+
+		const now = new Date(request.header('Date'));
+		if (isAfter(now, new Date(2020, 6, 9, 22, 29)) && isBefore(now, new Date(2020, 6, 10, 23, 59))) {
+			is_within_the_application_deadline = true;
+		} else {
+			is_within_the_application_deadline = false;
+		}
+
+		return {
+			participants,
+			is_participant: is_participant ? true : false,
+			is_within_the_application_deadline
+		}
 	}
 
 	/**
-	 * Create/save a new pixelthonparticipant.
+	 * Demonstra interesse para participar do Pixelthon
 	 * POST /pixelthon
 	 *
 	 * @param {object} ctx
@@ -53,7 +88,7 @@ class PixelthonController {
 
 		// Verifica se está dentro da data permitida para participar do Pixelthon
 		const now = new Date(request.header('Date'));
-		if (isAfter(now, new Date(2020, 6, 9, 22, 30)) && isBefore(now, new Date(2020, 6, 10, 23, 59))) {
+		if (isAfter(now, new Date(2020, 6, 9, 22, 29)) && isBefore(now, new Date(2020, 6, 10, 23, 59))) {
 
 			// Verifica se ainda há espaço para participar do evento
 			const participants = await PixelthonParticipant.getCount()
@@ -76,28 +111,6 @@ class PixelthonController {
 		} else {
 			return response.status(403).send({ error: "OUT_OF_REGISTRATION_DATE" });
 		}
-	}
-
-	/**
-	 * Update pixelthonparticipant details.
-	 * PUT or PATCH /pixelthon/:id
-	 *
-	 * @param {object} ctx
-	 * @param {Request} ctx.request
-	 * @param {Response} ctx.response
-	 */
-	async update({ params, request, response }) {
-	}
-
-	/**
-	 * Delete a pixelthonparticipant with id.
-	 * DELETE /pixelthon/:id
-	 *
-	 * @param {object} ctx
-	 * @param {Request} ctx.request
-	 * @param {Response} ctx.response
-	 */
-	async destroy({ params, request, response }) {
 	}
 }
 
