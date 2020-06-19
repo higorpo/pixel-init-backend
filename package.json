@@ -27,6 +27,7 @@
     "@adonisjs/validator": "^5.0.6",
     "adonis": "^0.9.0",
     "axios": "^0.19.2",
+    "date-fns": "^2.14.0",
     "mysql": "^2.18.1"
   },
   "devDependencies": {},
