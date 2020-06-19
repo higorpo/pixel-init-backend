@@ -10,6 +10,7 @@ class PixelthonParticipantsSchema extends Schema {
       table
         .integer('user_id')
         .unsigned()
+        .unique()
         .references('id')
         .inTable('users')
         .onDelete('CASCADE')

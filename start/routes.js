@@ -18,3 +18,4 @@ const Route = use('Route')
 
 Route.resource('/users', 'UserController');
 Route.resource('/sessions', 'SessionController');
+Route.resource('/pixelthon', 'PixelthonController').middleware(['auth']);
