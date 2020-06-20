@@ -8,6 +8,7 @@
 const { validate } = use('Validator')
 
 const User = use('App/Models/User');
+const PixelthonGroup = use('App/Models/PixelthonGroup');
 const PixelthonParticipant = use('App/Models/PixelthonParticipant');
 
 var { isAfter, isBefore } = require('date-fns');
@@ -15,7 +16,7 @@ var { isAfter, isBefore } = require('date-fns');
 /**
  * Resourceful controller for interacting with pixelthon participants
  */
-class PixelthonController {
+class PixelthonParticipantController {
 	/**
 	 * Mostra informações do Pixelthon
 	 * GET /pixelthon
@@ -57,11 +58,40 @@ class PixelthonController {
 			is_within_the_application_deadline = false;
 		}
 
-		return {
-			participants,
-			is_participant: is_participant ? true : false,
-			is_within_the_application_deadline
+		if (is_participant == 1) {
+			const participant = await PixelthonParticipant
+				.query()
+				.where('user_id', auth.user.id)
+				.first();
+
+			const colleagues = await PixelthonParticipant
+				.query()
+				.where('group', participant.group)
+				.andWhereNot('group', null)
+				.andWhereNot('user_id', auth.user.id)
+				.innerJoin('users', 'users.id', 'pixelthon_participants.user_id')
+				.select('users.*')
+				.fetch()
+
+			const groups_already_been_defined = await PixelthonGroup.getCount()
+
+			return {
+				participants,
+				is_participant: is_participant ? true : false,
+				is_within_the_application_deadline,
+				groups_already_been_defined: groups_already_been_defined > 0 ? true : false,
+				participant,
+				colleagues
+			}
+
+		} else {
+			return {
+				participants,
+				is_participant: is_participant ? true : false,
+				is_within_the_application_deadline
+			}
 		}
+
 	}
 
 	/**
@@ -116,4 +146,4 @@ class PixelthonController {
 	}
 }
 
-module.exports = PixelthonController
+module.exports = PixelthonParticipantController
