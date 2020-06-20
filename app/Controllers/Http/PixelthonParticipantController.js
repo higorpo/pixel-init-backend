@@ -62,6 +62,7 @@ class PixelthonParticipantController {
 			const participant = await PixelthonParticipant
 				.query()
 				.where('user_id', auth.user.id)
+				.select('group')
 				.first();
 
 			const colleagues = await PixelthonParticipant
@@ -70,7 +71,7 @@ class PixelthonParticipantController {
 				.andWhereNot('group', null)
 				.andWhereNot('user_id', auth.user.id)
 				.innerJoin('users', 'users.id', 'pixelthon_participants.user_id')
-				.select('users.*')
+				.select('users.id', 'users.first_name', 'users.last_name', 'users.avatar')
 				.fetch()
 
 			const groups_already_been_defined = await PixelthonGroup.getCount()
