@@ -50,7 +50,8 @@ class PixelthonController {
 		let is_within_the_application_deadline = false;
 
 		const now = new Date(request.header('Date'));
-		if (isAfter(now, new Date(2020, 6, 9, 22, 29)) && isBefore(now, new Date(2020, 6, 10, 23, 59))) {
+		// if (isAfter(now, new Date(2020, 6, 9, 22, 29)) && isBefore(now, new Date(2020, 6, 10, 23, 59))) {
+		if (isAfter(now, new Date(2020, 5, 19, 20, 54)) && isBefore(now, new Date(2020, 6, 10, 23, 59))) {
 			is_within_the_application_deadline = true;
 		} else {
 			is_within_the_application_deadline = false;
@@ -88,7 +89,8 @@ class PixelthonController {
 
 		// Verifica se está dentro da data permitida para participar do Pixelthon
 		const now = new Date(request.header('Date'));
-		if (isAfter(now, new Date(2020, 6, 9, 22, 29)) && isBefore(now, new Date(2020, 6, 10, 23, 59))) {
+		// if (isAfter(now, new Date(2020, 6, 9, 22, 29)) && isBefore(now, new Date(2020, 6, 10, 23, 59))) {
+		if (isAfter(now, new Date(2020, 5, 19, 20, 54)) && isBefore(now, new Date(2020, 6, 10, 23, 59))) {
 
 			// Verifica se ainda há espaço para participar do evento
 			const participants = await PixelthonParticipant.getCount()
