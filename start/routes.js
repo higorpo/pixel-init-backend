@@ -21,3 +21,6 @@ Route.resource('/sessions', 'SessionController');
 Route.resource('/pixelthon/groups', 'PixelthonGroupController').middleware(['auth']);
 Route.resource('/pixelthon/participant', 'PixelthonParticipantController').middleware(['auth']);
 Route.resource('/notifications', 'NotificationController').middleware(['auth']);
+Route.resource('/publications', 'PublicationController').middleware(['auth']);
+Route.post('/publications/:id/likes', 'PublicationLikeController.store').middleware(['auth']);
+Route.delete('/publications/:id/likes', 'PublicationLikeController.destroy').middleware(['auth']);
