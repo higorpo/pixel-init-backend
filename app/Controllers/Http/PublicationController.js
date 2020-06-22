@@ -78,7 +78,21 @@ class PublicationController {
 	async update({ params, request, response }) {
 	}
 
-	async destroy({ params, request, response }) {
+	async destroy({ params, request, response, auth }) {
+		const publication = await Publication
+			.query()
+			.where("id", params.id)
+			.first();
+
+		if (auth.user.is_admin == true || publication.user_id == auth.user.id) {
+			try {
+				await publication.delete();
+
+				return response.status(200).send();
+			} catch (error) {
+				return response.status(500).send({ error });
+			}
+		} else return response.status(403).send({ error: "NOT_AUTHORIZED" });
 	}
 }
 
