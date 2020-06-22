@@ -75,7 +75,21 @@ class PublicationCommentController {
 		}
 	}
 
-	async destroy({ params, request, response }) {
+	async destroy({ params, response, auth }) {
+		const comment = await PublicationComment
+			.query()
+			.where('id', params.id)
+			.first();
+
+		if (auth.user.is_admin == true || comment.user_id == auth.user.id) {
+			try {
+				await comment.delete();
+
+				return response.status(200).send();
+			} catch (error) {
+				return response.status(500).send({ error });
+			}
+		} else return response.status(403).send({ error: "NOT_AUTHORIZED" });
 	}
 }
 

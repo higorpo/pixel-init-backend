@@ -78,7 +78,7 @@ class PublicationController {
 	async update({ params, request, response }) {
 	}
 
-	async destroy({ params, request, response, auth }) {
+	async destroy({ params, response, auth }) {
 		const publication = await Publication
 			.query()
 			.where("id", params.id)
