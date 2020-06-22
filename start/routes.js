@@ -24,3 +24,4 @@ Route.resource('/notifications', 'NotificationController').middleware(['auth']);
 Route.resource('/publications', 'PublicationController').middleware(['auth']);
 Route.post('/publications/:id/likes', 'PublicationLikeController.store').middleware(['auth']);
 Route.delete('/publications/:id/likes', 'PublicationLikeController.destroy').middleware(['auth']);
+Route.resource('/publications/:id/comments', 'PublicationCommentController').middleware(['auth']);
