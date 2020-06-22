@@ -17,12 +17,13 @@ class SessionController {
 
             const user = await User
                 .query()
+                .select("id", "is_admin", "first_name", "last_name", "avatar")
                 .where("email", email)
                 .first();
 
             return {
                 token: token.token,
-                user_id: user.id
+                user
             };
         }
         catch (error) {
