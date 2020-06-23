@@ -29,6 +29,7 @@ class NotificationController {
 		const notifications = await Notification
 			.query()
 			.where('user_id', auth.user.id)
+			.with('connection_requested_by_user')
 			.orWhere('user_id', null)
 			.orderBy('created_at', 'DESC')
 			.orderBy('id', 'DESC')
