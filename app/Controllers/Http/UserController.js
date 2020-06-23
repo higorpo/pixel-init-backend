@@ -147,7 +147,21 @@ class UserController {
 	 * @param {Request} ctx.request
 	 * @param {Response} ctx.response
 	 */
-	async update({ params, request, response }) {
+	async update({ params, request, response, auth }) {
+		const user = await User
+			.query()
+			.where('id', auth.user.id)
+			.first();
+
+		let updatedUser = Object.assign(user, request.all());
+
+		try {
+			await updatedUser.save();
+
+			return response.status(200).send();
+		} catch (error) {
+			return response.status(error.status || 500).send({ error: error.name || error });
+		}
 	}
 
 	/**

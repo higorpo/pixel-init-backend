@@ -18,6 +18,7 @@ const Route = use('Route')
 
 Route.post('/users', 'UserController.store');
 Route.get('/users/:id', 'UserController.show').middleware(['auth']);
+Route.put('/users', 'UserController.update').middleware(['auth']);
 Route.resource('/sessions', 'SessionController');
 Route.resource('/pixelthon/groups', 'PixelthonGroupController').middleware(['auth']);
 Route.resource('/pixelthon/participant', 'PixelthonParticipantController').middleware(['auth']);
