@@ -11,6 +11,8 @@ const axios = require("axios");
 
 const User = use('App/Models/User');
 
+const Database = use('Database');
+
 /**
  * Resourceful controller for interacting with users
  */
@@ -121,7 +123,20 @@ class UserController {
 	 * @param {Response} ctx.response
 	 * @param {View} ctx.view
 	 */
-	async show({ params, request, response, view }) {
+	async show({ params, response, auth }) {
+		const user = await User
+			.query()
+			.select(Database.raw(`IF((SELECT id FROM user_connections WHERE (user_connections.user_id = users.id AND user_connections.connected_user_id = ?) OR (user_connections.user_id = ? AND user_connections.connected_user_id = users.id) LIMIT 1) IS NOT NULL, true, false) as is_connected_with_user`, [auth.user.id, auth.user.id]))
+			.select(Database.raw(`IF((SELECT id FROM notifications WHERE (notifications.user_id = users.id AND notifications.connection_request_user_id = ?) OR (notifications.user_id = ? AND notifications.connection_request_user_id = users.id) LIMIT 1) IS NOT NULL, true, false) as connection_is_requested`, [auth.user.id, auth.user.id]))
+			.select('id', 'email', 'first_name', 'last_name', 'avatar', 'whatsapp', 'linkedin_url', 'github_url', 'about', 'work')
+			.where('id', params.id)
+			.first();
+
+		if (!user) {
+			return response.status(404).send({ error: "USER_NOT_FOUND" })
+		}
+
+		return user;
 	}
 
 	/**

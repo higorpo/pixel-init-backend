@@ -16,7 +16,8 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.resource('/users', 'UserController');
+Route.post('/users', 'UserController.store');
+Route.get('/users/:id', 'UserController.show').middleware(['auth']);
 Route.resource('/sessions', 'SessionController');
 Route.resource('/pixelthon/groups', 'PixelthonGroupController').middleware(['auth']);
 Route.resource('/pixelthon/participant', 'PixelthonParticipantController').middleware(['auth']);
@@ -25,3 +26,4 @@ Route.resource('/publications', 'PublicationController').middleware(['auth']);
 Route.post('/publications/:id/likes', 'PublicationLikeController.store').middleware(['auth']);
 Route.delete('/publications/:id/likes', 'PublicationLikeController.destroy').middleware(['auth']);
 Route.resource('/publications/:id/comments', 'PublicationCommentController').middleware(['auth']);
+Route.resource('/users/:id/connections', 'UserConnectionController').middleware(['auth']);
