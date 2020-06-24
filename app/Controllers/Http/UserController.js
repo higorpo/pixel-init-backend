@@ -139,7 +139,7 @@ class UserController {
 			.query()
 			.select(Database.raw(`IF((SELECT id FROM user_connections WHERE (user_connections.user_id = users.id AND user_connections.connected_user_id = ?) OR (user_connections.user_id = ? AND user_connections.connected_user_id = users.id) LIMIT 1) IS NOT NULL, true, false) as is_connected_with_user`, [auth.user.id, auth.user.id]))
 			.select(Database.raw(`IF((SELECT id FROM notifications WHERE (notifications.user_id = users.id AND notifications.connection_request_user_id = ?) OR (notifications.user_id = ? AND notifications.connection_request_user_id = users.id) LIMIT 1) IS NOT NULL, true, false) as connection_is_requested`, [auth.user.id, auth.user.id]))
-			.select('id', 'email', 'first_name', 'last_name', 'avatar', 'whatsapp', 'linkedin_url', 'github_url', 'about', 'work')
+			.select('id', 'email', 'first_name', 'last_name', 'avatar', 'whatsapp', 'linkedin_url', 'github_url', 'about', 'work', 'is_admin')
 			.where('id', params.id)
 			.first();
 
