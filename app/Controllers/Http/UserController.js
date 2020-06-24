@@ -40,18 +40,13 @@ class UserController {
 	 */
 	async store({ request, session, response }) {
 		const rules = {
-			mail: 'required|email|unique:users,email',
-			password: 'required|min:5|max:15',
+			mail: 'required|email',
 			ticket_number: 'required|min:10|max:10'
 		}
 
 		const messages = {
 			'mail.required': "você precisa digitar um e-mail",
 			'mail.email': "formato de e-mail inválido",
-			'mail.unique': "está conta de e-mail já foi cadastrada no aplicativo!",
-			'password.required': "você precisa digitar uma senha",
-			'password.min': "sua senha deve ter no mínimo 5 caracteres",
-			'password.max': "sua senha deve ter no máximo 15 caracteres",
 			'ticket_number.required': "você precisa fornecer o número do ingresso do Sympla",
 			'ticket_number.min': "seu número de ingresso deve ter no mínimo 10 caracteres",
 			'ticket_number.max': "seu número de ingresso deve ter no máximo 10 caracteres",
@@ -63,7 +58,18 @@ class UserController {
 			return response.status(400).send(validation.messages())
 		}
 
-		const { ticket_number, mail, password } = request.all();
+		const { ticket_number, mail } = request.all();
+
+		// Verifica se o usuário já não foi criado antes
+		const userAlreadyExists = await User
+			.query()
+			.where('ticket_number', ticket_number)
+			.orWhere('email', mail)
+			.first();
+
+		if (userAlreadyExists) {
+			return response.status(200).send({ userExists: true });
+		}
 
 		try {
 			const symplaApi = await axios.get(`https://api.sympla.com.br/public/v3/events/867450/participants/ticketNumber/${ticket_number}`, {
@@ -94,13 +100,18 @@ class UserController {
 
 				const user = await User.create({
 					email,
-					password,
 					ticket_number,
 					first_name,
 					last_name,
 					whatsapp,
 					linkedin_url: linkedin,
 					github_url: github
+				})
+
+				await axios.post(`https://api.sympla.com.br/public/v3/events/867450/participants/ticketNumber/${ticket_number}/checkIn`, null, {
+					headers: {
+						"s_token": "8d52f0624bfb109a1f7b9e1ac1fd45eddbbefd0947f95f6506bb85df83753608"
+					}
 				})
 
 				return user;

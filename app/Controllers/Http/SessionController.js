@@ -10,16 +10,32 @@ const User = use('App/Models/User');
 
 class SessionController {
     async store({ request, response, auth }) {
-        const { email, password } = request.all();
+        const { email, ticket_number } = request.all();
 
         try {
-            const token = await auth.attempt(email, password);
 
             const user = await User
                 .query()
-                .select("id", "is_admin", "first_name", "last_name", "avatar")
+                .select("id", "is_admin", "first_name", "last_name", "avatar", "ticket_number")
+                .setHidden(['ticket_number'])
                 .where("email", email)
                 .first();
+
+            if (!user) {
+                throw {
+                    field: "mail",
+                    message: "e-mail não corresponde ao ingresso cadastrado"
+                }
+            }
+
+            if (user.ticket_number != ticket_number) {
+                throw {
+                    field: "ticket_number",
+                    message: "o número do ingresso está incorreto"
+                }
+            }
+
+            const token = await auth.generate(user);
 
             return {
                 token: token.token,
@@ -29,20 +45,9 @@ class SessionController {
         catch (error) {
             let errors = [];
 
-            if (error.uidField) {
-                errors.push({
-                    field: "mail",
-                    message: "e-mail incorreto!"
-                })
-            }
+            console.log(error)
 
-            if (error.passwordField) {
-                errors.push({
-                    field: "password",
-                    message: "senha incorreta!"
-                })
-            }
-
+            errors.push(error);
             return response.status(401).send(errors);
         }
     }

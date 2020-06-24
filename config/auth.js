@@ -70,7 +70,7 @@ module.exports = {
     model: 'App/Models/User',
     scheme: 'jwt',
     uid: 'email',
-    password: 'password',
+    password: 'ticket_number',
     options: {
       secret: Env.get('APP_KEY')
     }
